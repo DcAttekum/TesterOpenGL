@@ -46,6 +46,8 @@ struct ShaderSource {
     std::string fragment;
 };
 
+// ParseShader takes a file path that contains 2 sets of code for both a vertex shader and 
+// a fragment shader. The code is put into a string stream and convert to a string
 static ShaderSource ParseShader(const std::string& path) {
     enum class ShaderType {
         NONE = -1, 
@@ -126,7 +128,7 @@ int main(void) {
         std::cout << "There was a problem initializing glfw." << std::endl;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 640, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
