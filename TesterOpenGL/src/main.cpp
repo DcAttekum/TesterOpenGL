@@ -159,6 +159,10 @@ int main(void) {
         2, 3, 0
     };
 
+    unsigned int vArrayObject;
+    GLCall(glGenVertexArrays(1, &vArrayObject));
+    GLCall(glBindVertexArray(vArrayObject));
+
     // Vertex buffer
     unsigned int vBuffer;
     GLCall(glGenBuffers(1, &vBuffer));
@@ -186,13 +190,33 @@ int main(void) {
     // color of what we are drawing. 
     GLCall(int location = glGetUniformLocation(shader, "u_Color"));
     GLAssert(location == -1);
-    GLCall(glUniform4f(location, 1.0f, 0.5f, 0.8f, 1.0f));
+
+    // Unbinding everything to simulate what you would need to do when you have more than 1 thing on
+    // the screen. Because different things might need different buffers and programs. This way you
+    // would have to set everything again, because you will never know if stuff is setup correctly.
+    GLCall(glBindVertexArray(0));
+    GLCall(glUseProgram(0));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
+
+        GLCall(glUseProgram(shader));
+        GLCall(glUniform4f(location, 1.0f, 0.5f, 0.8f, 1.0f));
+
+        // This is what you would have to do without a vertex array object (vArrayObject). The vertex
+        // buffer would have to be bound and the attrib array needs to be set again. With the vertex 
+        // array object, this is not needed and you can just bind to that.
+        //GLCall(glBindBuffer(GL_ARRAY_BUFFER, vBuffer)); 
+        //GLCall(glEnableVertexAttribArray(0));
+        //GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
+
+        GLCall(glBindVertexArray(vArrayObject));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iBuffer));
 
         // Nullptr, because the index buffer is bound.
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
